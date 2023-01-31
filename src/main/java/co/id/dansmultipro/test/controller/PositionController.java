@@ -1,7 +1,6 @@
 package co.id.dansmultipro.test.controller;
 
-import co.id.dansmultipro.test.model.response.Position;
-import co.id.dansmultipro.test.model.response.PositionLocation;
+import co.id.dansmultipro.test.model.response.*;
 import co.id.dansmultipro.test.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class PositionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Position>> getAllPositions() {
+    public ResponseEntity<?> getAllPositions() {
         return ResponseEntity.ok(positionService.getAll());
     }
 
@@ -32,6 +31,29 @@ public class PositionController {
 
     @GetMapping("/by-location")
     public ResponseEntity<?> getByLocation() {
-        return ResponseEntity.ok(positionService.getByLocation());
+        ResponseWrapper<PositionLocation> res = new ResponseWrapper<>(positionService.getByLocation());
+
+        return ResponseEntity.ok(ApiResponse
+                .builder()
+                .code("00")
+                .message("SUCCESS")
+                .data(res)
+                .build());
+    }
+
+    @GetMapping("/by-filter")
+    public ResponseEntity<?> getByFilter(
+            @RequestParam(name = "findBy", required = true) String key,
+            @RequestParam(name = "findValue", required = true) String value
+    ) {
+
+        ResponseWrapper<FilterResponse> res = new ResponseWrapper<>(positionService.getByFilter(key, value));
+
+        return ResponseEntity.ok(ApiResponse
+                .builder()
+                .code(0)
+                .message("ok")
+                .data(res)
+                .build());
     }
 }

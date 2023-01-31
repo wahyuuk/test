@@ -1,5 +1,6 @@
 package co.id.dansmultipro.test.service;
 
+import co.id.dansmultipro.test.model.response.FilterResponse;
 import co.id.dansmultipro.test.model.response.Position;
 import co.id.dansmultipro.test.model.response.PositionLocation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,7 +69,7 @@ public class PositionService {
                                 PositionLocation positionLocation = PositionLocation
                                         .builder()
                                         .location(data.getLocation())
-                                        .positions(result.get(data.getLocation()))
+                                        .data(result.get(data.getLocation()))
                                         .build();
 
                                 return positionLocation;
@@ -78,6 +77,31 @@ public class PositionService {
                             .collect(Collectors.toSet());
 
             return positionLocations;
+        } catch (ResponseStatusException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Request failed");
+        }
+    }
+
+    public Set<FilterResponse> getByFilter(String key, String value) {
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate
+                    .exchange(URL.concat(".json"), HttpMethod.GET, null,
+                            new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                            });
+
+            Set<FilterResponse> res =
+                    response.getBody().stream()
+                            .filter(data -> data.get(key).toString().toLowerCase().contains(value.toLowerCase()))
+                            .map(data -> {
+                                FilterResponse filterResponse = FilterResponse.builder()
+                                        .findBy(key)
+                                        .data(data)
+                                        .build();
+                                return filterResponse;
+                            }).collect(Collectors.toSet());
+
+            return res;
+
         } catch (ResponseStatusException ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Request failed");
         }

@@ -10,5 +10,5 @@ import java.util.List;
 public class PositionLocation {
 
     private String location;
-    private List<Position> positions;
+    private List<Position> data;
 }
