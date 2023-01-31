@@ -1,6 +1,7 @@
 package co.id.dansmultipro.test.controller;
 
 import co.id.dansmultipro.test.model.response.Position;
+import co.id.dansmultipro.test.model.response.PositionLocation;
 import co.id.dansmultipro.test.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,10 @@ public class PositionController {
     @GetMapping("/{id}")
     public ResponseEntity<Position> getById(@PathVariable("id") String id) {
         return ResponseEntity.ok(positionService.getById(id));
+    }
+
+    @GetMapping("/by-location")
+    public ResponseEntity<?> getByLocation() {
+        return ResponseEntity.ok(positionService.getByLocation());
     }
 }
